@@ -1,0 +1,5 @@
+description = "Knitro - wrapper for Ziena's KITRO solver"
+version = "1.0"
+archive(byte) = "knitro.cma"
+archive(native) = "knitro.cmxa"
+requires = "bigarray"

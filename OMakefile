@@ -1,0 +1,40 @@
+USE_OCAMLFIND = true
+
+NATIVE_ENABLED = true
+BYTE_ENABLED = true
+
+OCAMLFLAGS  += -dtypes 
+OCAMLPACKS += bigarray
+
+FILES = c_knitro knitro_consts
+
+# KNITRO_HOME is the path of the directory in which Ziena's Knitro is installed 
+# compile with:
+#    KNITRO_HOME=/path/to/knitro omake
+
+KNITRO_LIB = $(KNITRO_HOME)/lib
+KNITRO_INC = $(KNITRO_HOME)/include
+
+knitro_consts.ml : $(KNITRO_INC)/knitro.h mkdefines.ml
+	ocaml str.cma mkdefines.ml $< > knitro_consts.ml
+
+knitro_wrap.o: knitro_wrap.c
+	$(OCAMLC) -I $(KNITRO_INC) -c $<
+
+knitro.cma: $(addsuffix .cmo, $(FILES)) knitro_wrap.o 
+        ocamlmklib -v -o knitro $(OCamlLinkSort $(addsuffix .cmo, $(FILES))) knitro_wrap.o -L$(KNITRO_LIB) -lknitro601  -lstdc++
+
+knitro.cmxa knitro.a: $(addsuffix .cmx, $(FILES)) $(addsuffix .o, $(FILES)) knitro_wrap.o 
+        ocamlmklib -v -o knitro $(OCamlLinkSort $(addsuffix .cmx, $(FILES))) knitro_wrap.o -L$(KNITRO_LIB) -lknitro601 -lstdc++
+
+OCAML_LIBS += knitro
+
+.DEFAULT: \
+	$(OCamlLibrary knitro, $(FILES)) \
+	$(OCamlProgram test, test )
+
+.PHONY:  clean
+
+clean:
+  rm -f $(filter-proper-targets $(ls R, .)) *.s *.annot *.so *.a
+
