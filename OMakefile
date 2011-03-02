@@ -4,7 +4,7 @@ NATIVE_ENABLED = true
 BYTE_ENABLED = true
 
 OCAMLFLAGS  += -dtypes 
-OCAMLPACKS += bigarray
+OCAMLPACKS += bigarray mikmatch_pcre
 
 FILES = c_knitro knitro_consts
 
@@ -38,3 +38,4 @@ OCAML_LIBS += knitro
 clean:
   rm -f $(filter-proper-targets $(ls R, .)) *.s *.annot *.so *.a
 
+test: $(OCamlProgram test_lsconvex, test_lsconvex lsconvex) 
